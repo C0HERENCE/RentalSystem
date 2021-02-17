@@ -23,7 +23,7 @@ namespace RentalSystem
             services.AddControllersWithViews();
 
             // In production, the React files will be served from this directory
-            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "ClientApp/build"; });
+            services.AddSpaStaticFiles(configuration => { configuration.RootPath = "client-app/dist"; });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -50,16 +50,16 @@ namespace RentalSystem
             {
                 endpoints.MapControllerRoute(
                     name: "default",
-                    pattern: "{controller}/{action=Index}/{id?}");
+                    pattern: "api/{controller}/{action=Index}/{id?}");
             });
 
             app.UseSpa(spa =>
             {
-                spa.Options.SourcePath = "ClientApp";
+                spa.Options.SourcePath = "client-app";
 
                 if (env.IsDevelopment())
                 {
-                    spa.UseReactDevelopmentServer(npmScript: "start");
+                    spa.UseReactDevelopmentServer(npmScript: "serve");
                 }
             });
         }
