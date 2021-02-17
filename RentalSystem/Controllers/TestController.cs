@@ -3,7 +3,7 @@
 namespace RentalSystem.Controllers
 {
     [ApiController]
-    [Route("about")]
+    [Route("api/[controller]")]
     public class TestController : Controller
     {
         public TestController()
