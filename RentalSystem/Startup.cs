@@ -1,8 +1,14 @@
+using System.Text;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.IdentityModel.Tokens;
+using RentalSystem.Dao;
+using RentalSystem.Models;
+using RentalSystem.Services;
 using VueCliMiddleware;
 
 namespace RentalSystem
@@ -16,15 +22,37 @@ namespace RentalSystem
 
         public IConfiguration Configuration { get; }
 
-        // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
 
-            // In production, the React files will be served from this directory
+            // Vue
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "client-app/dist"; });
 
+            // swagger
             services.AddSwaggerGen();
+            
+            // Jwt
+            var jwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
+            services.AddSingleton(jwtConfig);
+            services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+                .AddJwtBearer(options =>
+                {
+                    options.RequireHttpsMetadata = true;
+                    options.SaveToken = true;
+                    options.TokenValidationParameters = new TokenValidationParameters
+                    {
+                        ValidateIssuerSigningKey = true,
+                        IssuerSigningKey = new SymmetricSecurityKey(Encoding.ASCII.GetBytes(jwtConfig.Secret)),
+                        ValidIssuer = jwtConfig.Issuer,
+                        ValidAudience = jwtConfig.Audience,
+                        ValidateIssuer = true,
+                        ValidateAudience = true,
+                    };
+                });
+
+            services.AddScoped<IUserService, UserService>();
+            services.AddScoped<IUserDao, UserDao>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -37,14 +65,13 @@ namespace RentalSystem
             else
             {
                 app.UseExceptionHandler("/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
             app.UseHttpsRedirection();
-            app.UseStaticFiles();
             app.UseSpaStaticFiles();
 
+            // swagger
             app.UseSwagger();
             app.UseSwaggerUI();
 
