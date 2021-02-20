@@ -1,6 +1,5 @@
 ﻿using System.Data.SqlClient;
 using Dapper;
-using Microsoft.Extensions.Configuration;
 using RentalSystem.Models;
 using RentalSystem.Models.Dtos;
 
@@ -8,18 +7,18 @@ namespace RentalSystem.Dao
 {
     public class UserDao : IUserDao
     {
-        private readonly string _connectionString;
-        public UserDao(IConfiguration configuration)
+        private readonly SqlConnection _sqlConnection;
+
+        public UserDao(SqlConnection sqlConnection)
         {
-            _connectionString = configuration.GetConnectionString("RentalSystem");
+            _sqlConnection = sqlConnection;
         }
         
         public int AddUser(UserModel user)
         {
-            using var sqlConnection = new SqlConnection(_connectionString);
-            sqlConnection.Open();
+            _sqlConnection.Open();
             const string sql = "insert into [user] values (@description, @username, @password, @is_admin, @enabled)";
-            return sqlConnection.Execute(sql, new
+            return _sqlConnection.Execute(sql, new
             {
                 description = user.Description,
                 username = user.Username,
@@ -31,42 +30,32 @@ namespace RentalSystem.Dao
 
         public int RemoveUser(int id)
         {
-            using var sqlConnection = new SqlConnection(_connectionString);
-            sqlConnection.Open();
             const string sql = "update [user] set enabled = @enabled where id = @uid";
-            return sqlConnection.Execute(sql, new {enabled = 0, uid = id});
+            return _sqlConnection.Execute(sql, new {enabled = 0, uid = id});
         }
 
         public int UpdateUser(UserInfoDto user)
         {
-            using var sqlConnection = new SqlConnection(_connectionString);
-            sqlConnection.Open();
             const string sql = "update [user] set description = @description where id = @uid";
-            return sqlConnection.Execute(sql, new {description = user.Description, uid = user.Id});
+            return _sqlConnection.Execute(sql, new {description = user.Description, uid = user.Id});
         }
 
         public UserModel GetUserById(int id)
         {
-            using var sqlConnection = new SqlConnection(_connectionString);
-            sqlConnection.Open();
             const string sql = "select * from [user] where id = @uid";
-            return sqlConnection.QuerySingleOrDefault<UserModel>(sql, new {uid = id});
+            return _sqlConnection.QuerySingleOrDefault<UserModel>(sql, new {uid = id});
         }
 
         public UserModel GetUserByUsername(string username)
         {
-            using var sqlConnection = new SqlConnection(_connectionString);
-            sqlConnection.Open();
             const string sql = "select * from [user] where username = @uname";
-            return sqlConnection.QuerySingleOrDefault<UserModel>(sql, new {uname = username});
+            return _sqlConnection.QuerySingleOrDefault<UserModel>(sql, new {uname = username});
         }
 
         public int UpdatePassword(UserModel user)
         {
-            using var sqlConnection = new SqlConnection(_connectionString);
-            sqlConnection.Open();
             const string sql = "update [user] set password = @password where id = @uid";
-            return sqlConnection.Execute(sql, new {password = user.Password, uid = user.Id});
+            return _sqlConnection.Execute(sql, new {password = user.Password, uid = user.Id});
         }
     }
 }

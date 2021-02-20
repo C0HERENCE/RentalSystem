@@ -1,3 +1,4 @@
+using System.Data.SqlClient;
 using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
@@ -24,15 +25,14 @@ namespace RentalSystem
 
         public void ConfigureServices(IServiceCollection services)
         {
+            // 注入Controllers和Vue项目
             services.AddControllers();
-
-            // Vue
             services.AddSpaStaticFiles(configuration => { configuration.RootPath = "client-app/dist"; });
 
-            // swagger
+            // 注入swagger
             services.AddSwaggerGen();
             
-            // Jwt
+            // 注入Jwt
             var jwtConfig = Configuration.GetSection("JwtConfig").Get<JwtConfig>();
             services.AddSingleton(jwtConfig);
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -51,11 +51,19 @@ namespace RentalSystem
                     };
                 });
 
+            // 注入sqlConnection，从appsettings中读取连接字符串，自动打开连接，自动Dispose
+            services.AddTransient(provider =>
+            {
+                var sqlConnection = new SqlConnection(Configuration.GetConnectionString("RentalSystem"));
+                sqlConnection.Open();
+                return sqlConnection;
+            });
+            
+            // 注入Service和Dao
             services.AddScoped<IUserService, UserService>();
             services.AddScoped<IUserDao, UserDao>();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
