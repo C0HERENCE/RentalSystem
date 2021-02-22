@@ -10,13 +10,14 @@
 <!--          右侧按钮-->
           <b-navbar-nav class="ml-auto">
             <b-nav-item to="/contact">联系我们</b-nav-item>
-            <b-nav-item-dropdown right>
+            <b-nav-item-dropdown right v-if="$store.getters.IS_LOGIN">
               <template #button-content>
-                <em>749976734@qq.com</em>
+                <em>{{$store.state.user}}</em>
               </template>
               <b-dropdown-item to="/profile">个人中心</b-dropdown-item>
-              <b-dropdown-item href="#">登出</b-dropdown-item>
+              <b-dropdown-item @click="$store.commit('LOG_OUT')" href="/">登出</b-dropdown-item>
             </b-nav-item-dropdown>
+            <b-nav-item v-else to="/login">登录</b-nav-item>
           </b-navbar-nav>
         </b-collapse>
       </b-container>
@@ -74,6 +75,9 @@ export default {
         },
       ]
     }
+  },
+  methods: {
+
   },
 }
 </script>

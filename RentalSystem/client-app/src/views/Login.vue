@@ -4,19 +4,19 @@
       <!--    左侧logo和图片-->
       <b-col md="6">
         <div class="justify-content-center py-3">
-          <img src="../assets/login_left.png" class="image">
+          <img src="../assets/login_left.png" class="image" alt="登录插图">
         </div>
       </b-col>
       <!--    右侧登录表单-->
       <b-col md="6">
-        <div class="card border-0 px-4 py-5">
+        <b-form class="card border-0 px-4 py-5" id="login_form">
           <div class="row px-3">
             <label class="mb-1 text-sm">用户名</label>
-            <b-form-input class="mb-4" type="text" name="email" autocomplete="off" placeholder="输入电子邮箱"/>
+            <b-form-input class="mb-4" type="text" name="email" v-model="username" autocomplete="off" placeholder="输入电子邮箱"/>
           </div>
           <div class="row px-3">
             <label class="mb-1 text-sm">密码</label>
-            <b-form-input type="password" name="password" autocomplete="off" placeholder="输入密码"/>
+            <b-form-input type="password" name="password" v-model="password" autocomplete="off" placeholder="输入密码"/>
           </div>
           <div class="row px-3 my-4">
             <div class="custom-control custom-checkbox custom-control-inline">
@@ -26,14 +26,14 @@
             <a href="#" class="ml-auto mb-0 text-sm text-info">忘记密码?</a>
           </div>
           <div class="row mb-3 px-3">
-            <b-button type="submit" variant="info">登录</b-button>
+            <b-button variant="info" @click="login">登录</b-button>
           </div>
           <div class="row mb-4 px-3">
             <small class="font-weight-bold">还没有账户?
               <a class="text-info">去注册</a>
             </small>
           </div>
-        </div>
+        </b-form>
       </b-col>
     </b-row>
   </div>
@@ -41,7 +41,21 @@
 
 <script>
 export default {
-  name: "Login"
+  name: "Login",
+  data() {
+    return {
+      username: "",
+      password: ""
+    }
+  },
+  methods: {
+    login() {
+      console.log(this.username + '\n' + this.password)
+      this.$store.commit('SET_TOKEN', '123123123123')
+      this.$store.commit('SET_USER', '123123')
+      window.location.href="/";
+    }
+  },
 }
 </script>
 
