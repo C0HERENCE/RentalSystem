@@ -30,7 +30,7 @@
           </div>
           <div class="row mb-4 px-3">
             <small class="font-weight-bold">还没有账户?
-              <a class="text-info">去注册</a>
+              <router-link class="text-info" to='/register'>去注册</router-link>
             </small>
           </div>
         </b-form>
@@ -51,9 +51,15 @@ export default {
   methods: {
     login() {
       console.log(this.username + '\n' + this.password)
+      console.log(this.$http);
       this.$store.commit('SET_TOKEN', '123123123123')
       this.$store.commit('SET_USER', '123123')
-      window.location.href="/";
+      this.$bvModal.msgBoxOk('登录成功，即将跳转到首页')
+      .catch(()=>{});
+      setTimeout(() => {
+          this.$bvModal.hide()
+          // this.$router.push('/')
+      }, 1500);
     }
   },
 }

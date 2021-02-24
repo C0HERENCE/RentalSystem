@@ -1,7 +1,7 @@
 <template>
   <div>
-    <MainCarousel></MainCarousel>
     <b-container>
+      <MainCarousel></MainCarousel>
       <h1>首页</h1>
     </b-container>
   </div>

@@ -76,7 +76,6 @@ namespace RentalSystem
                 app.UseHsts();
             }
 
-            app.UseHttpsRedirection();
             app.UseSpaStaticFiles();
 
             // swagger

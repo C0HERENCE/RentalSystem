@@ -35,7 +35,7 @@
           <b-button size="sm" class="my-2 my-sm-0 col-auto" type="submit">搜索</b-button>
         </b-row>
 <!--        购物车等按钮-->
-        <b-button size="sm" class="mr-2 my-sm-0">发布</b-button>
+        <b-button size="sm" class="mr-2 my-sm-0" to='/publish'>发布</b-button>
         <b-button size="sm" class="mr-2 my-sm-0">购物车</b-button>
       </b-row>
     </b-container>
