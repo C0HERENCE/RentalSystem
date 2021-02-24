@@ -9,7 +9,8 @@ import 'bootstrap/dist/css/bootstrap.css'
 import 'bootstrap-vue/dist/bootstrap-vue.css'
 
 Vue.config.productionTip = false
-axios.defaults.baseURL = 'http://127.0.0.1:8888/api/private/v1/'
+axios.defaults.baseURL = 'http://localhost:5000/api/'
+axios.defaults.headers = {"Content-Type" : "application/json"}
 Vue.prototype.$http = axios
 Vue.use(BootstrapVue)
 Vue.use(BootstrapVueIcons)

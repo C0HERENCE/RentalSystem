@@ -27,7 +27,7 @@ namespace RentalSystem.Services
             return _userDao.AddUser(userModel);
         }
 
-        public int UpdateUserInfoByUserName(UserInfoDto userInfoDto)
+        public int UpdateUserInfoById(UserInfoDto userInfoDto)
         {
             return _userDao.UpdateUser(userInfoDto);
         }

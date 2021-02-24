@@ -7,7 +7,7 @@ namespace RentalSystem.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UserController : Controller
+    public class UserController : BaseController
     {
         private readonly IUserService _userService;
 
@@ -21,42 +21,43 @@ namespace RentalSystem.Controllers
         {
             var user = _userService.GetUserByUsername(userModel.Username);
             if (user == null)
-                return BadRequest("用户名不存在");
+                return Failed("用户名不存在");
             if (user.Password != userModel.Password)
-                return BadRequest("密码错误");
-            return Ok("登录成功");
+                return Failed("密码错误");
+            return Success("登录成功");
         }
 
         [HttpPost]
         public IActionResult Register([FromBody] UserModel userModel)
         {
             if (!ModelState.IsValid)
-                return BadRequest("参数不合法");
+                return Failed("参数不合法");
             if (_userService.GetUserByUsername(userModel.Username) != null)
-                return BadRequest("该用户名已被使用");
+                return Failed("该用户名已被使用");
+            userModel.Enabled = 1; // 注册用户默认为启用状态
             if (_userService.AddUser(userModel) != 1)
-                return BadRequest("注册失败");
-            return Ok("注册成功");
+                return Failed("注册失败");
+            return Success("注册成功");
         }
 
         [HttpPut]
         public IActionResult Reset([FromBody] UserInfoDto userInfoDtos)
         {
             if (!ModelState.IsValid)
-                return BadRequest("参数不合法");
-            if (_userService.UpdateUserInfoByUserName(userInfoDtos) != 1)
-                return BadRequest("用户信息更新失败");
-            return Ok("用户信息更新成功");
+                return Failed("参数不合法");
+            if (_userService.UpdateUserInfoById(userInfoDtos) != 1)
+                return Failed("用户信息更新失败");
+            return Success("用户信息更新成功");
         }
         
         [HttpPut("[action]")]
         public IActionResult ResetPassword([FromBody] UserModel userModel)
         {
             if (!ModelState.IsValid)
-                return BadRequest("参数不合法");
+                return Failed("参数不合法");
             if (_userService.UpdateUserPassword(userModel) != 1)
-                return BadRequest("用户信息更新失败");
-            return Ok("用户信息更新成功");
+                return Failed("用户信息更新失败");
+            return Success("用户信息更新成功");
         }
 
         [HttpGet("{id}")]

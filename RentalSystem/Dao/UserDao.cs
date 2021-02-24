@@ -16,7 +16,6 @@ namespace RentalSystem.Dao
         
         public int AddUser(UserModel user)
         {
-            _sqlConnection.Open();
             const string sql = "insert into [user] values (@description, @username, @password, @is_admin, @enabled)";
             return _sqlConnection.Execute(sql, new
             {

@@ -1,8 +1,10 @@
 <template>
-  <div>
-    <TopNavbar></TopNavbar>
-    <router-view></router-view>
-    <Footer></Footer>
+  <div class="main-container">
+    <div class="upper-part">
+      <TopNavbar></TopNavbar>
+      <router-view></router-view>
+    </div>
+    <Footer class="footer"></Footer>
   </div>
 </template>
 
@@ -16,5 +18,20 @@ export default {
 </script>
 
 <style scoped>
-
+.main-container
+{
+  min-height: 100vh;
+  position: relative;
+}
+.upper-part
+{
+  padding-bottom:4em;
+}
+.footer
+{
+  position: absolute;
+  bottom: 0;
+  height: 4em;
+  width:100%
+}
 </style>

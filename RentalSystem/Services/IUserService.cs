@@ -8,7 +8,7 @@ namespace RentalSystem.Services
         UserModel GetUserById(int id);
         UserModel GetUserByUsername(string username);
         int AddUser(UserModel userModel);
-        int UpdateUserInfoByUserName(UserInfoDto userModel);
+        int UpdateUserInfoById(UserInfoDto userModel);
         int UpdateUserPassword(UserModel userModel);
     }
 }

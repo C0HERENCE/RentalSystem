@@ -14,11 +14,9 @@ export default new Vuex.Store({
   },
   mutations: {
     SET_TOKEN: (state, data) => {
-      state.token = data;
       window.sessionStorage.setItem('token', data);
     },
     SET_USER: (state, data) => {
-      state.user = data;
       window.sessionStorage.setItem('user', data)
     },
     LOG_OUT: () => {

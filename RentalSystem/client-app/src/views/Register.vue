@@ -27,7 +27,7 @@
             <b-form-input class="mb-4" type="password" name="password_repeat" v-model="password_repeat" autocomplete="off" placeholder="重复输入密码"/>
           </div>
           <div class="row mb-3 px-3">
-            <b-button variant="info" @click="register">注册</b-button>
+            <b-button variant="info" @click="register" :disabled="disabled">注册</b-button>
           </div>
           <div class="row mb-4 px-3">
             <small class="font-weight-bold">已有账户?
@@ -49,20 +49,41 @@ export default {
             username: '',
             password: '',
             password_repeat: '',
+            disabled: false
         }
     },
     methods: {
         register() {
-            console.log(this.email + '\n' + this.username + '\n' + this.password_repeat);
+            this.disabled = true;
+            if (this.password === "" || this.password_repeat === "" || this.email === "" || this.username === "")
+            {
+              this.$bvToast.toast('请将注册信息填写完整');
+              return;
+            }
             if (this.password !== this.password_repeat)
             {
-                this.$bvModal.msgBoxOk('两次密码输入不一致');
+                this.$bvToast.toast('两次密码输入不一致');
                 return;
             }
-            this.$bvModal.msgBoxOk('注册成功，即将跳转到登录页面');
-            setTimeout(() => {
-                this.$router.push('/login')
-            }, 1500);
+            this.$http.post('/user', {
+              username: this.username,
+              password: this.password,
+              email: this.email,
+            }).then(response => {
+              this.$bvToast.toast(response.data.result);
+              if (response.data.status === 1)
+              {
+                setTimeout(() => {
+                  this.$router.push('/login')
+                }, 1500);
+              }
+            }).catch(()=>{
+              this.$bvToast.toast("注册失败");
+            }).finally(() => {
+              this.disabled = false;
+              this.password_repeat = "";
+              this.password = "";
+            });
         }
     }
 }
