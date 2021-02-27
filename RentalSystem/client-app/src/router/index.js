@@ -1,7 +1,7 @@
 import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
-
+import store from "../store"
 Vue.use(VueRouter)
 
 const routes = [
@@ -50,7 +50,15 @@ const routes = [
   {
     name: 'Publish',
     path: '/publish',
-    component: () => import('../views/Publish')
+    component: () => import('../views/Publish'),
+    meta: {
+      requireAuth: true
+    }
+  },
+  {
+    name: 'GoodsDetail',
+    path: '/goods/:id',
+    component: () => import('../views/GoodsDetail')
   }
 ]
 
@@ -59,5 +67,20 @@ const router = new VueRouter({
   base: process.env.BASE_URL,
   routes
 })
+
+router.beforeEach(((to, from, next) => {
+  if (to.matched.some(record => record.meta.requireAuth)) {
+    if (store.getters.IS_LOGIN)
+      next();
+    else
+      next({
+        path: '/login',
+        query: {redirect: to.fullPath}
+      })
+  }
+  else{
+    next();
+  }
+}))
 
 export default router

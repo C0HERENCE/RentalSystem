@@ -27,5 +27,13 @@ namespace RentalSystem.Controllers
         {
             return Success("ok", _dbContext.Categories.Where(c => c.ParentId == 0).ToList());
         }
+
+        [HttpGet("detail/{id}")]
+        public IActionResult CategoryDetail(int id)
+        {
+            return _dbContext.Categories.Count(c => c.Id == id) == 0
+                ? NotFound("分类不存在")
+                : Success("ok", _dbContext.Categories.FirstOrDefault(c => c.Id == id));
+        }
     }
 }

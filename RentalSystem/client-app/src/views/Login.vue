@@ -12,7 +12,8 @@
         <b-form class="card border-0 px-4 py-5">
           <div class="row px-3">
             <label class="mb-1 text-sm">用户名</label>
-            <b-form-input class="mb-4" type="text" name="email" v-model="username" autocomplete="off" placeholder="请输入用户名"/>
+            <b-form-input class="mb-4" type="text" name="email" v-model="username" autocomplete="off"
+                          placeholder="请输入用户名"/>
           </div>
           <div class="row px-3">
             <label class="mb-1 text-sm">密码</label>
@@ -40,6 +41,8 @@
 </template>
 
 <script>
+import {login} from "@/api/user";
+
 export default {
   name: "Login",
   data() {
@@ -56,25 +59,20 @@ export default {
         return;
       }
       this.disabled = true;
-      this.$http.post('/user/login', {
-        "username": this.username,
-        "password": this.password
-      }).then(response => {
-        this.$bvToast.toast(response.data.result)
-        if (response.data.status === 1) {
-          this.$store.commit('SET_TOKEN', 'f') // TODO: TOKEN
-          this.$store.commit('SET_USER', this.username)
-          setTimeout(() => {
-            window.location.href = '/'
-          }, 1500);
-        }
-      }).catch(()=>{
-        this.$bvToast.toast("注册失败")
-      }).finally(() => {
-        this.password = "";
-        this.disabled = false;
-        }
-      )
+      login(this.username, this.password)
+          .then(res => {
+            this.$store.commit('SET_TOKEN', res.result)
+            this.$store.commit('SET_USER', this.username)
+            setTimeout(() => {
+              window.location.href = '/'
+            }, 1500);
+          })
+          .catch(err => console.log(err))
+          .finally(() => {
+                this.password = "";
+                this.disabled = false;
+              }
+          )
     },
   },
   mounted() {

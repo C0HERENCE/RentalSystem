@@ -1,5 +1,5 @@
 <template>
-  <b-contianer class="py-3">
+  <b-container class="py-3">
     <b-row class="my-5">
       <!--    左侧logo和图片-->
       <b-col md="6">
@@ -12,19 +12,23 @@
         <b-form class="card border-0 px-4 py-5">
           <div class="row px-3">
             <label class="mb-1 text-sm">邮箱</label>
-            <b-form-input class="mb-4" type="text" name="email" v-model="email" autocomplete="off" placeholder="输入电子邮箱"/>
+            <b-form-input class="mb-4" type="text" name="email" v-model="email" autocomplete="off"
+                          placeholder="输入电子邮箱"/>
           </div>
           <div class="row px-3">
             <label class="mb-1 text-sm">用户名</label>
-            <b-form-input class="mb-4" type="text" name="username" v-model="username" autocomplete="off" placeholder="输入用户名"/>
+            <b-form-input class="mb-4" type="text" name="username" v-model="username" autocomplete="off"
+                          placeholder="输入用户名"/>
           </div>
           <div class="row px-3">
             <label class="mb-1 text-sm">密码</label>
-            <b-form-input class="mb-4" type="password" name="password" v-model="password" autocomplete="off" placeholder="输入密码"/>
+            <b-form-input class="mb-4" type="password" name="password" v-model="password" autocomplete="off"
+                          placeholder="输入密码"/>
           </div>
           <div class="row px-3">
             <label class="mb-1 text-sm">重复密码</label>
-            <b-form-input class="mb-4" type="password" name="password_repeat" v-model="password_repeat" autocomplete="off" placeholder="重复输入密码"/>
+            <b-form-input class="mb-4" type="password" name="password_repeat" v-model="password_repeat"
+                          autocomplete="off" placeholder="重复输入密码"/>
           </div>
           <div class="row mb-3 px-3">
             <b-button variant="info" @click="register" :disabled="disabled">注册</b-button>
@@ -37,55 +41,55 @@
         </b-form>
       </b-col>
     </b-row>
-  </b-contianer>
+  </b-container>
 </template>
 
 <script>
+import {register} from "@/api/user";
+
 export default {
-    name: "Register",
-    data() {
-        return {
-            email: '',
-            username: '',
-            password: '',
-            password_repeat: '',
-            disabled: false
-        }
-    },
-    methods: {
-        register() {
-            this.disabled = true;
-            if (this.password === "" || this.password_repeat === "" || this.email === "" || this.username === "")
-            {
-              this.$bvToast.toast('请将注册信息填写完整');
-              return;
-            }
-            if (this.password !== this.password_repeat)
-            {
-                this.$bvToast.toast('两次密码输入不一致');
-                return;
-            }
-            this.$http.post('/user', {
-              username: this.username,
-              password: this.password,
-              email: this.email,
-            }).then(response => {
-              this.$bvToast.toast(response.data.result);
-              if (response.data.status === 1)
-              {
-                setTimeout(() => {
-                  this.$router.push('/login')
-                }, 1500);
-              }
-            }).catch(()=>{
-              this.$bvToast.toast("注册失败");
-            }).finally(() => {
-              this.disabled = false;
-              this.password_repeat = "";
-              this.password = "";
-            });
-        }
+  name: "Register",
+  data() {
+    return {
+      email: '',
+      username: '',
+      password: '',
+      password_repeat: '',
+      disabled: false
     }
+  },
+  methods: {
+    register() {
+      if (this.password === "" || this.password_repeat === "" || this.email === "" || this.username === "") {
+        this.$bvToast.toast('请将注册信息填写完整');
+        return;
+      }
+      if (this.password !== this.password_repeat) {
+        this.$bvToast.toast('两次密码输入不一致');
+        return;
+      }
+      let data = {
+        username: this.username,
+        password: this.password,
+        email: this.email,
+      };
+      this.disabled = true;
+      register(data)
+          .then(() => {
+            setTimeout(() => {
+              this.$router.push('/login')
+            }, 1500);
+          })
+          .catch(() => {
+            this.$bvToast.toast("注册失败");
+          })
+          .finally(() => {
+            this.disabled = false;
+            this.password_repeat = "";
+            this.password = "";
+          });
+    }
+  }
 }
 </script>
 

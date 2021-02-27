@@ -52,28 +52,14 @@
 </template>
 
 <script>
+import {getCategories} from "@/api/category";
+
 export default {
   name: 'TopNavbar',
   data() {
+    getCategories().then(res => res.result.forEach(c => this.categories.push({id: c.id, text: c.description})))
     return {
-      categories: [
-        {
-          id: 1,
-          text: '数码',
-        },
-        {
-          id: 2,
-          text: '运动',
-        },
-        {
-          id: 3,
-          text: '服饰',
-        },
-        {
-          id: 4,
-          text: '图书',
-        },
-      ]
+      categories: []
     }
   },
   methods: {

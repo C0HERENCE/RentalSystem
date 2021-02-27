@@ -53,12 +53,13 @@ namespace RentalSystem.Controllers
             var good = new Good
             {
                 UserId =  userId,
-                BrandId =  0, // TODO 品牌功能,
+                BrandId =  goodsRequest.brand_id,
                 CategoryId = goodsRequest.category_id,
                 Name = goodsRequest.name,
                 Enabled = 1,
                 OnSale = 1, // TODO 管理员审核功能
                 Price = goodsRequest.price,
+                Pic = goodsRequest.pic,
                 Description = goodsRequest.description,
                 OriginalPrice = goodsRequest.original_price,
                 Stock = goodsRequest.stock,
@@ -74,7 +75,8 @@ namespace RentalSystem.Controllers
             try
             {
                 _dbContext.Goods.Add(good);
-                return Success("发布成功");
+                _dbContext.SaveChanges();
+                return Success("发布成功", good.Id);
             }
             catch (Exception e)
             {
