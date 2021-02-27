@@ -1,6 +1,8 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using System;
+using System.Linq;
+using Microsoft.AspNetCore.Mvc;
+using RentalSystem.Dao;
 using RentalSystem.Models;
-using RentalSystem.Models.Dtos;
 using RentalSystem.Services;
 
 namespace RentalSystem.Controllers
@@ -9,65 +11,97 @@ namespace RentalSystem.Controllers
     [Route("api/[controller]")]
     public class UserController : BaseController
     {
-        private readonly IUserService _userService;
+        private readonly RentalSystemDbContext _dbContext;
+        private readonly JwtService _jwt;
 
-        public UserController(IUserService userService)
+        public UserController(RentalSystemDbContext dbContext, JwtService jwtService)
         {
-            _userService = userService;
+            _dbContext = dbContext;
+            _jwt = jwtService;
         }
         
         [HttpPost("[action]")]
-        public IActionResult Login([FromBody] UserModel userModel)
+        public IActionResult Login([FromBody] dynamic userRequest)
         {
-            var user = _userService.GetUserByUsername(userModel.Username);
-            if (user == null)
-                return Failed("用户名不存在");
-            if (user.Password != userModel.Password)
-                return Failed("密码错误");
-            return Success("登录成功");
+            string username = userRequest.username;
+            string password = userRequest.password;
+            
+            if (_dbContext.Users.Count(u => u.Username == username) != 1)
+                return NotFound("用户名不存在");
+            var user = _dbContext.Users.FirstOrDefault(u => u.Username == username && u.Password == password);
+            return user ==
+                   null
+                ? BadRequest("密码错误")
+                : Success("登录成功", _jwt.GenerateToken(user.Id));
         }
 
         [HttpPost]
-        public IActionResult Register([FromBody] UserModel userModel)
+        public IActionResult Register([FromBody] dynamic user)
         {
-            if (!ModelState.IsValid)
-                return Failed("参数不合法");
-            if (_userService.GetUserByUsername(userModel.Username) != null)
-                return Failed("该用户名已被使用");
-            userModel.Enabled = 1; // 注册用户默认为启用状态
-            if (_userService.AddUser(userModel) != 1)
-                return Failed("注册失败");
-            return Success("注册成功");
+            var userAdd = new User
+            {
+                Description = "",
+                Enabled = 1,
+                Password = user.password,
+                Username = user.username,
+                IsAdmin = 0
+            };
+
+            if (_dbContext.Users.Count(u => u.Username == userAdd.Username) != 0)
+                return BadRequest("该用户名已被使用");
+            return _dbContext.Users.Add(userAdd).Entity == null ? BadRequest("注册失败") : Success("注册成功");
         }
 
         [HttpPut]
-        public IActionResult Reset([FromBody] UserInfoDto userInfoDtos)
+        public IActionResult Update([FromBody] dynamic userRequest)
         {
-            if (!ModelState.IsValid)
-                return Failed("参数不合法");
-            if (_userService.UpdateUserInfoById(userInfoDtos) != 1)
-                return Failed("用户信息更新失败");
-            return Success("用户信息更新成功");
+            int id = userRequest.id;
+            var user = _dbContext.Users.FirstOrDefault(u=>u.Id==id);
+            if (user == null) return NotFound("用户不存在");
+            user.Description = userRequest.description;
+            try
+            {
+                _dbContext.Update(user);
+                return Success("用户信息更新成功");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Error("用户信息更新失败");
+            }
         }
         
         [HttpPut("[action]")]
-        public IActionResult ResetPassword([FromBody] UserModel userModel)
+        public IActionResult ResetPassword([FromBody] dynamic userRequest)
         {
-            if (!ModelState.IsValid)
-                return Failed("参数不合法");
-            if (_userService.UpdateUserPassword(userModel) != 1)
-                return Failed("用户信息更新失败");
-            return Success("用户信息更新成功");
+            int id = userRequest.id;
+            var user = _dbContext.Users.FirstOrDefault(u => u.Id == id);
+            if (user == null) return NotFound("用户不存在");
+            user.Password = userRequest.password;
+            try
+            {
+                _dbContext.Update(user);
+                return Success("用户密码更新成功");
+            }
+            catch (Exception e)
+            {
+                Console.WriteLine(e);
+                return Error("用户密码更新失败");
+            }
         }
-
+        
         [HttpGet("{id}")]
-        public IActionResult GetUserInfo(int id)
+        public IActionResult GetUser(int id)
         {
-            var userModel = _userService.GetUserById(id);
-            if (userModel == null)
-                return BadRequest("用户不存在");
-            var infoDto = new UserInfoDto {Id = userModel.Id, Username = userModel.Username, Description = userModel.Description};
-            return Ok(infoDto);
+            var user = _dbContext.Users.FirstOrDefault(u=>u.Id == id);
+            if (user == null)
+                return NotFound("用户不存在");
+            return Success("ok", new
+            {
+                id = user.Id,
+                username = user.Username,
+                description = user.Description,
+            });
         }
     }
 }

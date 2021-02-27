@@ -1,15 +1,15 @@
 <template>
-    <div class="container py-3">
+  <b-contianer class="py-3">
     <b-row class="my-5">
       <!--    左侧logo和图片-->
       <b-col md="6">
         <div class="justify-content-center py-3">
-          <img src="../assets/register_left.png" class="image" alt="登录插图">
+          <img src="../assets/register_left.png" class="image" alt="注册插图">
         </div>
       </b-col>
       <!--    右侧注册表单-->
       <b-col md="6">
-        <b-form class="card border-0 px-4 py-5" id="login_form">
+        <b-form class="card border-0 px-4 py-5">
           <div class="row px-3">
             <label class="mb-1 text-sm">邮箱</label>
             <b-form-input class="mb-4" type="text" name="email" v-model="email" autocomplete="off" placeholder="输入电子邮箱"/>
@@ -37,7 +37,7 @@
         </b-form>
       </b-col>
     </b-row>
-  </div>
+  </b-contianer>
 </template>
 
 <script>
@@ -89,6 +89,12 @@ export default {
 }
 </script>
 
-<style>
+<style scoped>
+.image {
+  width: 100%;
+}
 
+.text-sm {
+  font-size: 14px
+}
 </style>

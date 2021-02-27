@@ -1,5 +1,5 @@
 <template>
-  <div class="container py-3">
+  <b-container class="py-3">
     <b-row class="my-5">
       <!--    左侧logo和图片-->
       <b-col md="6">
@@ -9,11 +9,10 @@
       </b-col>
       <!--    右侧登录表单-->
       <b-col md="6">
-        <b-form class="card border-0 px-4 py-5" id="login_form">
+        <b-form class="card border-0 px-4 py-5">
           <div class="row px-3">
             <label class="mb-1 text-sm">用户名</label>
-            <b-form-input class="mb-4" type="text" name="email" v-model="username" autocomplete="off"
-                          placeholder="请输入用户名"/>
+            <b-form-input class="mb-4" type="text" name="email" v-model="username" autocomplete="off" placeholder="请输入用户名"/>
           </div>
           <div class="row px-3">
             <label class="mb-1 text-sm">密码</label>
@@ -37,7 +36,7 @@
         </b-form>
       </b-col>
     </b-row>
-  </div>
+  </b-container>
 </template>
 
 <script>
