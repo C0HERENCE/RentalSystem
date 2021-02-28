@@ -12,8 +12,8 @@ namespace RentalSystem.Services
     public class JwtService
     {
         private readonly JwtConfig _jwtConfig;
-        
-        private readonly string _identifier = "userid";
+
+        private const string Identifier = "userid";
 
         public JwtService(JwtConfig jwtConfig)
         {
@@ -26,7 +26,7 @@ namespace RentalSystem.Services
             {
                 Subject = new ClaimsIdentity(new[]
                 {
-                    new Claim(_identifier, userId.ToString()),
+                    new Claim(Identifier, userId.ToString()),
                 }),
                 Expires = DateTime.UtcNow.AddDays(7),
                 Issuer = _jwtConfig.Issuer,
@@ -41,11 +41,11 @@ namespace RentalSystem.Services
             return tokenHandler.WriteToken(token);
         }
 
-        public int GetUserId(HttpContext httpContext)
+        public static int GetUserId(HttpContext httpContext)
         {
             try
             {
-                var claim = httpContext.User.Claims.First(x => x.Type == _identifier);
+                var claim = httpContext.User.Claims.First(x => x.Type == Identifier);
                 return int.Parse(claim.Value);
             }
             catch (Exception)

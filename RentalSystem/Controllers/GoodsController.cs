@@ -13,29 +13,39 @@ namespace RentalSystem.Controllers
     public class GoodsController : BaseController
     {
         private readonly RentalSystemDbContext _dbContext;
-        private readonly JwtService _jwt;
 
-        public GoodsController(RentalSystemDbContext dbContext, JwtService jwt)
+        public GoodsController(RentalSystemDbContext dbContext)
         {
             _dbContext = dbContext;
-            _jwt = jwt;
         }
         
         [HttpGet]
         public IActionResult GetByCategoryId([FromQuery]int categoryId, [FromQuery]int page = 0, [FromQuery]int limit = 20)
         {
-            if (limit > 50)
+            if (limit > 50 || page < 1)
                 return BadRequest("传输数据量过大");
             var category = _dbContext.Categories.FirstOrDefault(c => c.Id == categoryId);
             if (category == null)
                 return NotFound("分类不存在");
-            if (category.ParentId == 0)
-                return BadRequest("请传入一个子分类");
+            var cid = categoryId;
             return Success("ok",
-                _dbContext.Goods.Where(g => g.CategoryId == categoryId)
-                    .OrderBy(g => g.Id)
-                    .Skip(page * limit)
-                    .Take(limit).ToList());
+                new
+                {
+                    data = _dbContext.Goods.Where(g => g.CategoryId == cid)
+                        .OrderBy(g => g.Id)
+                        .Skip((page - 1) * limit)
+                        .Take(limit).ToList(),
+                    total = _dbContext.Goods.Count(g => g.OnSale == 1 && g.Enabled == 1 && g.CategoryId == cid)
+                });
+        }
+
+        [Authorize]
+        [HttpGet("user")]
+        public IActionResult GetByUserId()
+        {
+            var id = JwtService.GetUserId(HttpContext);
+            return Success("ok",
+                _dbContext.Goods.Where(g => g.UserId == id).ToList());
         }
 
         [HttpGet("{id}")]
@@ -49,7 +59,7 @@ namespace RentalSystem.Controllers
         [HttpPost]
         public IActionResult Publish([FromBody] dynamic goodsRequest)
         {
-            var userId = _jwt.GetUserId(HttpContext);
+            var userId = JwtService.GetUserId(HttpContext);
             var good = new Good
             {
                 UserId =  userId,

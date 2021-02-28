@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Linq;
+using System.Runtime.InteropServices;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using RentalSystem.Dao;
 using RentalSystem.Models;
@@ -52,16 +54,18 @@ namespace RentalSystem.Controllers
             return _dbContext.Users.Add(userAdd).Entity == null ? BadRequest("注册失败") : Success("注册成功");
         }
 
+        [Authorize]
         [HttpPut]
         public IActionResult Update([FromBody] dynamic userRequest)
         {
-            int id = userRequest.id;
+            var id = JwtService.GetUserId(HttpContext);
             var user = _dbContext.Users.FirstOrDefault(u=>u.Id==id);
             if (user == null) return NotFound("用户不存在");
             user.Description = userRequest.description;
             try
             {
                 _dbContext.Update(user);
+                _dbContext.SaveChanges();
                 return Success("用户信息更新成功");
             }
             catch (Exception e)
@@ -71,16 +75,22 @@ namespace RentalSystem.Controllers
             }
         }
         
-        [HttpPut("[action]")]
+        [Authorize]
+        [HttpPut("password")]
         public IActionResult ResetPassword([FromBody] dynamic userRequest)
         {
-            int id = userRequest.id;
+            var id = JwtService.GetUserId(HttpContext);
             var user = _dbContext.Users.FirstOrDefault(u => u.Id == id);
-            if (user == null) return NotFound("用户不存在");
-            user.Password = userRequest.password;
+            if (user == null)
+                return NotFound("用户不存在");
+            string oldPassword = userRequest.old_password;
+            user.Password = userRequest.new_password;
+            if (_dbContext.Users.Count(u=>u.Password == oldPassword && u.Id == user.Id) != 1)
+                return BadRequest("原密码错误");
             try
             {
                 _dbContext.Update(user);
+                _dbContext.SaveChanges();
                 return Success("用户密码更新成功");
             }
             catch (Exception e)
@@ -90,9 +100,10 @@ namespace RentalSystem.Controllers
             }
         }
         
-        [HttpGet("{id}")]
-        public IActionResult GetUser(int id)
+        [HttpGet]
+        public IActionResult GetUser(int? id)
         {
+            id ??= JwtService.GetUserId(HttpContext);
             var user = _dbContext.Users.FirstOrDefault(u=>u.Id == id);
             if (user == null)
                 return NotFound("用户不存在");

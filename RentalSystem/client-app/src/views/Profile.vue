@@ -9,8 +9,11 @@
         <b-list-group-item>
           <router-link to="/profile/reset">修改密码</router-link>
         </b-list-group-item>
+        <b-list-group-item>
+          <router-link to="/profile/goods">发布的商品</router-link>
+        </b-list-group-item>
       </b-list-group>
-      <router-view></router-view>
+      <router-view class="col-sm-9 col-xl-10"></router-view>
     </b-row>
   </div>
 </template>
