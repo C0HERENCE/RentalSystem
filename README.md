@@ -1,4 +1,5 @@
 # RentalSystem
+校园租赁平台Demo, .NET5+SignalR+Efcore+SqlServer+vue 
 ``` bash
 RentalServer # 后端
 ├── Data # (EF Core DbContext)
